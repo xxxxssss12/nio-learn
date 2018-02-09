@@ -14,17 +14,16 @@ import java.util.Set;
  * Created by xs on 2018/2/8
  *
  */
-        /*
+public class SelectorServer {
+    private static int LISTEN_PORT = 5300;
+    public static void main(String[] args) {
+         /*
         ServerSocketChannel
         ServerSocket
         SocketChannel
         Selector
         SelectionKey
          */
-public class SelectorServer {
-    private static int LISTEN_PORT = 5300;
-    public static void main(String[] args) {
-
         try {
             ServerSocketChannel ssc = buildServerSocketChannel();
 
@@ -53,6 +52,7 @@ public class SelectorServer {
                         sc.configureBlocking( false );
                         SelectionKey newKey = sc.register( selector, SelectionKey.OP_READ );
                         System.out.println( "Got connection from "+sc );
+                        printSelectorKeys(selector);
                     }
                     if (key.isReadable()) {
                         // 有请求进来
@@ -84,6 +84,12 @@ public class SelectorServer {
     }
 
     private static void printSelectorKeys(Selector selector) {
+        Set<SelectionKey> keys = selector.keys();
+        Iterator<SelectionKey> iterator = keys.iterator();
+        while (iterator.hasNext()) {
+            SelectionKey key = iterator.next();
+            System.out.println("all:selectKey hashCode=" + key.hashCode());
+        }
     }
 
     private static void doPost(String result, SocketChannel sc) {
