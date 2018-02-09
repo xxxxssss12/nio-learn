@@ -31,7 +31,7 @@ public class SelectorServer {
             SelectionKey skey = ssc.register( selector, SelectionKey.OP_ACCEPT );
 
             ByteBuffer echoBuffer = ByteBuffer.allocate(128);
-
+            printSelectorKeys(selector);
             System.out.println("channel 准备就绪！");
             while(true) {
                 int num = selector.select();//获取通道内是否有选择器的关心事件
@@ -65,7 +65,7 @@ public class SelectorServer {
                         echoBuffer.flip();
                         if (bytesEchoed == -1) {
                             System.out.println("connect finish!over!");
-                            sc.socket().close();
+                            sc.close();
                             printSelectorKeys(selector);
                             break;
                         }
@@ -100,7 +100,7 @@ public class SelectorServer {
         ServerSocketChannel channel = ServerSocketChannel.open();
         channel.configureBlocking( false );//使通道为非阻塞
         ServerSocket ss = channel.socket();//创建基于NIO通道的socket连接
-        ss.bind(new InetSocketAddress("127.0.0.1",LISTEN_PORT));//新建socket通道的端口
+        ss.bind(new InetSocketAddress(LISTEN_PORT));//新建socket通道的端口
         //将NIO通道选绑定到择器,当然绑定后分配的主键为skey
         return channel;
     }
