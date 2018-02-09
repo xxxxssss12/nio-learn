@@ -6,10 +6,7 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
-import java.nio.channels.ServerSocketChannel;
-import java.nio.channels.SocketChannel;
+import java.nio.channels.*;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -48,12 +45,12 @@ public class SelectorServer {
                     //遍历每个key
                     SelectionKey key = it.next();
                     it.remove();
+                    System.out.println("key hashCode=" + key.hashCode());
                     if (key.isAcceptable()) {
                         // 有新的socket链接进来
                         ServerSocketChannel serverChanel = (ServerSocketChannel)key.channel();
                         SocketChannel sc = serverChanel.accept();
                         sc.configureBlocking( false );
-
                         SelectionKey newKey = sc.register( selector, SelectionKey.OP_READ );
                         System.out.println( "Got connection from "+sc );
                     }
@@ -66,10 +63,10 @@ public class SelectorServer {
                             System.out.println("bytesEchoed:"+bytesEchoed);
                         }
                         echoBuffer.flip();
-                        System.out.println("limit:"+echoBuffer.limit());
                         if (bytesEchoed == -1) {
                             System.out.println("connect finish!over!");
                             sc.socket().close();
+                            printSelectorKeys(selector);
                             break;
                         }
                         byte [] content = new byte[echoBuffer.limit()];
@@ -86,6 +83,9 @@ public class SelectorServer {
 
     }
 
+    private static void printSelectorKeys(Selector selector) {
+    }
+
     private static void doPost(String result, SocketChannel sc) {
         System.out.println(result);
     }
@@ -97,5 +97,9 @@ public class SelectorServer {
         ss.bind(new InetSocketAddress("127.0.0.1",LISTEN_PORT));//新建socket通道的端口
         //将NIO通道选绑定到择器,当然绑定后分配的主键为skey
         return channel;
+    }
+    private static void register(ServerSocketChannel ssc, Selector selector, int ops) throws ClosedChannelException {
+        SelectionKey key = ssc.register(selector, ops);
+        System.out.println("selectKey hashCode=" + key.hashCode());
     }
 }
