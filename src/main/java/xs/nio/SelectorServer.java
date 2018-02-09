@@ -15,10 +15,8 @@ import java.util.Set;
 
 /**
  * Created by xs on 2018/2/8
+ *
  */
-public class SelectorServer {
-    private static int LISTEN_PORT = 5300;
-    public static void main(String[] args) {
         /*
         ServerSocketChannel
         ServerSocket
@@ -26,6 +24,10 @@ public class SelectorServer {
         Selector
         SelectionKey
          */
+public class SelectorServer {
+    private static int LISTEN_PORT = 5300;
+    public static void main(String[] args) {
+
         try {
             ServerSocketChannel ssc = buildServerSocketChannel();
 
@@ -58,12 +60,18 @@ public class SelectorServer {
                     if (key.isReadable()) {
                         // 有请求进来
                         SocketChannel sc = (SocketChannel)key.channel();
+                        System.out.println("address:" + sc.socket().getPort());
                         int bytesEchoed = 0;
                         while((bytesEchoed = sc.read(echoBuffer))> 0){
                             System.out.println("bytesEchoed:"+bytesEchoed);
                         }
                         echoBuffer.flip();
                         System.out.println("limit:"+echoBuffer.limit());
+                        if (bytesEchoed == -1) {
+                            System.out.println("connect finish!over!");
+                            sc.socket().close();
+                            break;
+                        }
                         byte [] content = new byte[echoBuffer.limit()];
                         echoBuffer.get(content);
                         String result=new String(content, "utf-8");

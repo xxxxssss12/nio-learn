@@ -40,8 +40,8 @@ public class TestClient {
                 readline = br.readLine(); // 从系统标准输入读入一字符串
             } // 继续循环
             //4、关闭资源
-            write.close(); // 关闭Socket输出流
-            in.close(); // 关闭Socket输入流
+            socket.shutdownInput();
+            socket.shutdownOutput();
             socket.close(); // 关闭Socket
         } catch (Exception e) {
             e.printStackTrace();// 出错，打印出错信息
