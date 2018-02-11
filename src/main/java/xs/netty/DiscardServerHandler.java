@@ -14,6 +14,7 @@ import java.nio.charset.Charset;
  */
 public class DiscardServerHandler extends ChannelInboundHandlerAdapter { // (1)
 
+
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) { // (2)
         // Discard the received data silently.
@@ -22,7 +23,6 @@ public class DiscardServerHandler extends ChannelInboundHandlerAdapter { // (1)
             // Do something with msg
             ByteBuf in = (ByteBuf) msg;
             while (in.isReadable()) { // (1)
-
                 System.out.print(in.readCharSequence(in.readableBytes(), Charset.defaultCharset()));
                 System.out.flush();
             }

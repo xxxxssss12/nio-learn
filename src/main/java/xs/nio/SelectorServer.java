@@ -38,6 +38,7 @@ public class SelectorServer {
                 if (num < 1) {
                     continue;
                 }
+
                 Set<SelectionKey> selectedKeys = selector.selectedKeys();//获取通道内关心事件的集合
                 Iterator<SelectionKey> it = selectedKeys.iterator();
                 while (it.hasNext()) {

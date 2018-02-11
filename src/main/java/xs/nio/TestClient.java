@@ -35,7 +35,8 @@ public class TestClient {
                 // 刷新输出流，使Server马上收到该字符串
                 System.out.println("Client:" + readline);
                 // 在系统标准输出上打印读入的字符串
-//                System.out.println("Server:" + in.readLine());
+//                String line = in.readLine();
+//                System.out.println("Server:" + line);
                 // 从Server读入一字符串，并打印到标准输出上
                 readline = br.readLine(); // 从系统标准输入读入一字符串
             } // 继续循环
