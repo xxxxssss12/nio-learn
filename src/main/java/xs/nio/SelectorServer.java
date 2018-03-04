@@ -16,6 +16,8 @@ import java.util.Set;
  */
 public class SelectorServer {
     private static int LISTEN_PORT = 5300;
+    private static int cnt = 0;
+
     public static void main(String[] args) {
          /*
         ServerSocketChannel
@@ -31,7 +33,7 @@ public class SelectorServer {
             SelectionKey skey = ssc.register( selector, SelectionKey.OP_ACCEPT );
 
             ByteBuffer echoBuffer = ByteBuffer.allocate(128);
-            printSelectorKeys(selector);
+//            printSelectorKeys(selector);
             System.out.println("channel 准备就绪！");
             while(true) {
                 int num = selector.select();//获取通道内是否有选择器的关心事件
@@ -53,25 +55,27 @@ public class SelectorServer {
                         sc.configureBlocking( false );
                         SelectionKey newKey = sc.register( selector, SelectionKey.OP_READ );
                         System.out.println( "Got connection from "+sc );
-                        printSelectorKeys(selector);
+//                        printSelectorKeys(selector);
                     }
                     if (key.isReadable()) {
                         // 有请求进来
                         SocketChannel sc = (SocketChannel)key.channel();
                         System.out.println("address:" + sc.socket().getPort());
                         int bytesEchoed = 0;
-                        while((bytesEchoed = sc.read(echoBuffer))> 0){
+                        while((bytesEchoed = sc.read(echoBuffer)) > 0){
                             System.out.println("bytesEchoed:"+bytesEchoed);
                         }
                         echoBuffer.flip();
+
                         if (bytesEchoed == -1) {
                             System.out.println("connect finish!over!");
                             sc.close();
-                            printSelectorKeys(selector);
+//                            printSelectorKeys(selector);
                             break;
                         }
                         byte [] content = new byte[echoBuffer.limit()];
                         echoBuffer.get(content);
+
                         String result=new String(content, "utf-8");
                         doPost(result,sc);
                         echoBuffer.clear();
@@ -94,7 +98,16 @@ public class SelectorServer {
     }
 
     private static void doPost(String result, SocketChannel sc) {
-        System.out.println(result);
+        try {
+//            sc.write(ByteBuffer.wrap((result +"..."+ (++cnt)).getBytes()));
+            ByteBuffer buf = ByteBuffer.wrap("测试".getBytes());
+            System.out.println(buf.remaining());
+            sc.write(buf);
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+//        System.out.println("doPost():" + (result +"..."+ (++cnt)));
+        System.out.println("doPost()");
     }
 
     private static ServerSocketChannel buildServerSocketChannel() throws IOException {

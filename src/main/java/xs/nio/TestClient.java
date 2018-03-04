@@ -1,30 +1,25 @@
 package xs.nio;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 
-/**
- * Created by xs on 2018/2/8
- */
 public class TestClient {
-
-    public static void main(String[] args) {
+    // 搭建客户端
+    public static void main(String[] args) throws IOException {
         try {
             // 1、创建客户端Socket，指定服务器地址和端口
             // Socket socket=new Socket("127.0.0.1",5200);
             Socket socket = new Socket("127.0.0.1", 5300);
+            new Thread(new SocketReadThread(socket)).start();
             System.out.println("客户端启动成功");
+
             // 2、获取输出流，向服务器端发送信息
-            // 向本机的5300端口发出客户请求
+            // 向本机的52000端口发出客户请求
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
             // 由系统标准输入设备构造BufferedReader对象
             PrintWriter write = new PrintWriter(socket.getOutputStream());
             // 由Socket对象得到输出流，并构造PrintWriter对象
-            //3、获取输入流，并读取服务器端的响应信息
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            // 由Socket对象得到输入流，并构造相应的BufferedReader对象
+
             String readline;
             readline = br.readLine(); // 从系统标准输入读入一字符串
             while (!readline.equals("end")) {
@@ -34,18 +29,46 @@ public class TestClient {
                 write.flush();
                 // 刷新输出流，使Server马上收到该字符串
                 System.out.println("Client:" + readline);
-                // 在系统标准输出上打印读入的字符串
-//                String line = in.readLine();
-//                System.out.println("Server:" + line);
                 // 从Server读入一字符串，并打印到标准输出上
                 readline = br.readLine(); // 从系统标准输入读入一字符串
             } // 继续循环
             //4、关闭资源
-            socket.shutdownInput();
-            socket.shutdownOutput();
+            write.close(); // 关闭Socket输出流
             socket.close(); // 关闭Socket
         } catch (Exception e) {
-            e.printStackTrace();// 出错，打印出错信息
+            System.out.println("can not listen to:" + e);// 出错，打印出错信息
+        }
+    }
+}
+
+class SocketReadThread implements Runnable {
+
+    private Socket socket;
+    public SocketReadThread(Socket socket) {
+        this.socket = socket;
+    }
+    @Override
+    public void run() {
+        try {
+
+            InputStream is = socket.getInputStream();
+            byte[] bt = new byte[1024];
+
+            System.out.println("读监听开始...");
+            for (;;) {
+                StringBuilder sb = new StringBuilder();
+                int size = is.read(bt);
+                if (size >= 0) {
+                    sb.append(new String(bt,0, size, "utf-8"));
+                } else {
+                    is.close();
+                    break;
+                }
+                System.out.println("SocketReadThread:size=" + size + ";" + sb);
+            }
+            System.out.println("服务端dead，读监听结束");
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }
