@@ -1,6 +1,6 @@
 # new AnnotationConfigApplicationContext(Application.class) 学习
 
-``` java
+```java
     /**
      * Create a new AnnotationConfigApplicationContext, deriving bean definitions
      * from the given annotated classes and automatically refreshing the context.
@@ -35,7 +35,7 @@
 ```
 
 register方法是注册这个class的方法，往里面走走主要看这个方法：
-``` java
+```java
     /**
      * Register a bean from the given bean class, deriving its metadata from
      * class-declared annotations.
@@ -89,3 +89,64 @@ register方法是注册这个class的方法，往里面走走主要看这个方�
 首先他是一个beanDefinition。
 一个BeanDefinition描述了一个bean的实例，包括属性值，构造方法参数值和继承自它的类的更多信息。
 BeanDefinition仅仅是一个最简单的接口，主要功能是允许BeanFactoryPostProcessor 例如PropertyPlaceHolderConfigure能够检索并修改属性值和别的bean的元数据。
+
+生成之后执行abd.setInstanceSupplier(instanceSupplier);这个看起来是一个实例提供者，可以自定义用来自己代理bean？该方法中是null。
+metadata暂且理解成properties，就当它是一堆配置，约束信息。
+往下走ScopeMetadata.getName().equals("singleton")，emmm，看起来是个bean生成规则。
+
+继续走到AnnotationConfigUtils.processCommonDefinitionAnnotations(abd)。这个方法中在启动类上寻找5个注解：Lazy、Primary、DependsOn、Role、Description并且set到annotatedBeanDefinition中。先不管他，反正一个没有。
+
+接下来定义了一个BeanDefinitionHolder。顾名思义他是用来映射类名和类定义的可看成一个“map”。
+然后走到最后一步BeanDefinitionReaderUtils.registerBeanDefinition(definitionHolder, this.registry);这个方法看起来是最终注册的方法了。
+
+结论是register方法只是将启动类注册到了上下文（beanMap）中。真正将其他bean注册进去的方法在refresh()里。
+
+===========================================================================================
+
+先把代码贴上来。。
+```java
+    @Override
+    public void refresh() throws BeansException, IllegalStateException {
+        synchronized (this.startupShutdownMonitor) {
+            // Prepare this context for refreshing.
+            prepareRefresh();
+            // Tell the subclass to refresh the internal bean factory.
+            ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
+            // Prepare the bean factory for use in this context.
+            prepareBeanFactory(beanFactory);
+            try {
+                // Allows post-processing of the bean factory in context subclasses.
+                postProcessBeanFactory(beanFactory);
+                // Invoke factory processors registered as beans in the context.
+                invokeBeanFactoryPostProcessors(beanFactory);
+                // Register bean processors that intercept bean creation.
+                registerBeanPostProcessors(beanFactory);
+                // Initialize message source for this context.
+                initMessageSource();
+                // Initialize event multicaster for this context.
+                initApplicationEventMulticaster();
+                // Initialize other special beans in specific context subclasses.
+                onRefresh();
+                // Check for listener beans and register them.
+                registerListeners();
+                // Instantiate all remaining (non-lazy-init) singletons.
+                finishBeanFactoryInitialization(beanFactory);
+                // Last step: publish corresponding event.
+                finishRefresh();
+            }
+            catch (BeansException ex) {
+                // Destroy already created singletons to avoid dangling resources.
+                destroyBeans();
+                // Reset 'active' flag.
+                cancelRefresh(ex);
+                // Propagate exception to caller.
+                throw ex;
+            }
+            finally {
+                // Reset common introspection caches in Spring's core, since we
+                // might not ever need metadata for singleton beans anymore...
+                resetCommonCaches();
+            }
+        }
+    }
+```
