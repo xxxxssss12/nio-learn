@@ -85,3 +85,7 @@ register方法是注册这个class的方法，往里面走走主要看这个方�
         BeanDefinitionReaderUtils.registerBeanDefinition(definitionHolder, this.registry);
     }
 ```
+第一步创建了一个AnnotatedGenericBeanDefinition的实例，这个东西是啥呢。
+首先他是一个beanDefinition。
+一个BeanDefinition描述了一个bean的实例，包括属性值，构造方法参数值和继承自它的类的更多信息。
+BeanDefinition仅仅是一个最简单的接口，主要功能是允许BeanFactoryPostProcessor 例如PropertyPlaceHolderConfigure能够检索并修改属性值和别的bean的元数据。
