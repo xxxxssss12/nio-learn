@@ -1,6 +1,6 @@
 # new AnnotationConfigApplicationContext(Application.class) 学习
 
-```java
+``` java
     /**
      * Create a new AnnotationConfigApplicationContext, deriving bean definitions
      * from the given annotated classes and automatically refreshing the context.
@@ -35,7 +35,7 @@
 ```
 
 register方法是注册这个class的方法，往里面走走主要看这个方法：
-```java
+``` java
     /**
      * Register a bean from the given bean class, deriving its metadata from
      * class-declared annotations.
@@ -103,8 +103,8 @@ metadata暂且理解成properties，就当它是一堆配置，约束信息。
 
 ===========================================================================================
 
-先把代码贴上来。。
-```java
+先把代码贴上来。。AbstractApplicationContext.refresh()
+``` java
     @Override
     public void refresh() throws BeansException, IllegalStateException {
         synchronized (this.startupShutdownMonitor) {
