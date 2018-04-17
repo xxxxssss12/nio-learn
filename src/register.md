@@ -108,41 +108,57 @@ metadata暂且理解成properties，就当它是一堆配置，约束信息。
     @Override
     public void refresh() throws BeansException, IllegalStateException {
         synchronized (this.startupShutdownMonitor) {
+            // 准备这个上下文用来refreshing
             // Prepare this context for refreshing.
             prepareRefresh();
+            // 告诉子类刷新内部bean工厂
             // Tell the subclass to refresh the internal bean factory.
             ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
+            // 准备在这上下文中使用的bean工厂
             // Prepare the bean factory for use in this context.
             prepareBeanFactory(beanFactory);
             try {
+                // 允许在上下文子类中对bean工厂进行后处理
                 // Allows post-processing of the bean factory in context subclasses.
                 postProcessBeanFactory(beanFactory);
+                // 在上下文中调用注册为bean的工厂处理器
                 // Invoke factory processors registered as beans in the context.
                 invokeBeanFactoryPostProcessors(beanFactory);
+                // 注册拦截bean创建的bean处理器
                 // Register bean processors that intercept bean creation.
                 registerBeanPostProcessors(beanFactory);
+                // 初始化此上下文的消息源
                 // Initialize message source for this context.
                 initMessageSource();
+                // 初始化此上下文的事件广播器
                 // Initialize event multicaster for this context.
                 initApplicationEventMulticaster();
+                // 在特定的上下文子类中初始化其他特殊的bean
                 // Initialize other special beans in specific context subclasses.
                 onRefresh();
+                // 检查监听器bean并注册它们
                 // Check for listener beans and register them.
                 registerListeners();
+                // 实例化所有剩下的（非懒加载）单例
                 // Instantiate all remaining (non-lazy-init) singletons.
                 finishBeanFactoryInitialization(beanFactory);
+                // 最后一步：发布相应的事件
                 // Last step: publish corresponding event.
                 finishRefresh();
             }
             catch (BeansException ex) {
+                // 销毁已经创建的单例对象以避免资源浪费
                 // Destroy already created singletons to avoid dangling resources.
                 destroyBeans();
+                // 重置“有效”标志
                 // Reset 'active' flag.
                 cancelRefresh(ex);
+                // 向呼叫者传播异常
                 // Propagate exception to caller.
                 throw ex;
             }
             finally {
+                // 在Spring的核心中重置常见的"反省"缓存，因为我们可能不再需要单例bean的元数据了
                 // Reset common introspection caches in Spring's core, since we
                 // might not ever need metadata for singleton beans anymore...
                 resetCommonCaches();
