@@ -9,7 +9,7 @@ public class TestClient {
         try {
             // 1、创建客户端Socket，指定服务器地址和端口
             // Socket socket=new Socket("127.0.0.1",5200);
-            Socket socket = new Socket("127.0.0.1", 5300);
+            Socket socket = new Socket("127.0.0.1", 9999);
             new Thread(new SocketReadThread(socket)).start();
             System.out.println("客户端启动成功");
 
