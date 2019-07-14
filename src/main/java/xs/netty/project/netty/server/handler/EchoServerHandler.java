@@ -6,6 +6,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.CharsetUtil;
 import io.netty.util.ReferenceCountUtil;
+import xs.netty.project.util.InputUtil;
 
 /**
  * ChannelInboundHandlerAdapter是针对数据输入的处理
@@ -14,7 +15,7 @@ public class EchoServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         // 客户端连接成功时触发
-        byte data[] = "[server]connect success!".getBytes(CharsetUtil.UTF_8);
+        byte data[] = InputUtil.buildPackage("[server]connect success!".getBytes(CharsetUtil.UTF_8));
         ByteBuf buf = Unpooled.buffer(data.length); // netty自定义缓存
 
         buf.writeBytes(data);
@@ -31,7 +32,8 @@ public class EchoServerHandler extends ChannelInboundHandlerAdapter {
             if ("exit".equalsIgnoreCase(inputData)) {
                 respData = "quit.";
             }
-            byte[] data = respData.getBytes();
+            byte[] data = InputUtil.buildPackage(respData.getBytes());
+
             ByteBuf respbuf = Unpooled.buffer(data.length); // netty自定义缓存
             respbuf.writeBytes(data);
             ctx.writeAndFlush(respbuf);

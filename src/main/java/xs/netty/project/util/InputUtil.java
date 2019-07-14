@@ -34,4 +34,12 @@ public class InputUtil {
         }
         return str;
     }
+
+    public static byte[] buildPackage(byte[] bytes) {
+
+        byte[] bt = new byte[bytes.length + HostInfo.SEPERATOR.length];
+        System.arraycopy(bytes, 0, bt, 0, bytes.length);
+        System.arraycopy(HostInfo.SEPERATOR, 0, bt, bytes.length, HostInfo.SEPERATOR.length);
+        return bt;
+    }
 }

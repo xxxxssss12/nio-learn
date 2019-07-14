@@ -23,7 +23,7 @@ public class EchoClientHandler extends ChannelInboundHandlerAdapter {
             } else {
                 System.out.println("server response:" + readData);
                 String inputData = InputUtil.getString("请输入要发送的消息: ");
-                byte[] data = inputData.getBytes(CharsetUtil.UTF_8);
+                byte[] data = InputUtil.buildPackage(inputData.getBytes(CharsetUtil.UTF_8));
                 ByteBuf sendBuf = Unpooled.buffer(data.length);
                 sendBuf.writeBytes(data);
                 ctx.writeAndFlush(sendBuf);
